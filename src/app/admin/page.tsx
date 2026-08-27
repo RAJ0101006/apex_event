@@ -1,7 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
 import { Users, Image as ImageIcon, Briefcase, MessageSquare } from "lucide-react";
 import Link from "next/link";
-export const dynamic = "force-dynamic";
+
 const prisma = new PrismaClient();
 
 export default async function AdminDashboard() {
