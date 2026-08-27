@@ -6,9 +6,8 @@
   "dev": "next dev",
   "build": "next build",
   "start": "next start",
-  "lint": "next lint",
   "postinstall": "prisma generate"
-  } ,
+  },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "framer-motion": "^13.1.1",
