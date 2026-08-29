@@ -1,6 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
-import { createEvent } from "../actions";
-import { Plus } from "lucide-react";
+import { createEvent, deleteEvent } from "../actions";
+import { Plus, Trash2 } from "lucide-react";
 
 const prisma = new PrismaClient();
 
@@ -58,19 +60,34 @@ export default async function GalleryPage() {
         {/* List of events */}
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
           {events.map((event) => (
-            <div key={event.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden group shadow-sm">
-              <div className="h-48 bg-gray-100 relative overflow-hidden">
-                <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                {event.featured && (
-                  <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
-                    Featured
+            <div key={event.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden group shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="h-48 bg-gray-100 relative overflow-hidden">
+                  <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {event.featured && (
+                    <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
+                      Featured
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <div className="text-xs font-bold text-primary mb-1 uppercase tracking-wider">{event.category}</div>
+                      <h3 className="font-heading font-bold text-lg text-foreground">{event.title}</h3>
+                    </div>
+                    <form action={deleteEvent.bind(null, event.id)}>
+                      <button 
+                        type="submit" 
+                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 shadow-xs flex-shrink-0"
+                        title="Remove event"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </form>
                   </div>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="text-xs font-bold text-primary mb-1 uppercase tracking-wider">{event.category}</div>
-                <h3 className="font-heading font-bold text-lg text-foreground">{event.title}</h3>
-                {event.description && <p className="text-sm text-foreground/60 mt-1 line-clamp-2">{event.description}</p>}
+                  {event.description && <p className="text-sm text-foreground/60 mt-2 line-clamp-2">{event.description}</p>}
+                </div>
               </div>
             </div>
           ))}
@@ -79,3 +96,4 @@ export default async function GalleryPage() {
     </div>
   );
 }
+

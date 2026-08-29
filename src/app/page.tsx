@@ -1,4 +1,7 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
+import { headers } from "next/headers";
 import Navbar from "./components/Navbar";
 import WhatsAppWidget from "./components/WhatsAppWidget";
 import ContactForm from "./components/ContactForm";
@@ -9,6 +12,25 @@ import { MapPin, Phone, ArrowRight, Crown } from "lucide-react";
 const prisma = new PrismaClient();
 
 export default async function Home() {
+  // Visitor Tracking
+  try {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+    const userAgent = headerStore.get("user-agent") || "unknown";
+    const referrer = headerStore.get("referer") || "direct";
+
+    await prisma.visitorLog.create({
+      data: {
+        ip,
+        userAgent,
+        referrer,
+        path: "/",
+      },
+    });
+  } catch (error) {
+    console.error("Failed to track visitor:", error);
+  }
+
   const services = await prisma.service.findMany({
     orderBy: { createdAt: "desc" },
     take: 5

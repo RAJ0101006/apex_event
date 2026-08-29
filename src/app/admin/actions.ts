@@ -1,11 +1,53 @@
-"use server"
+"use server";
 
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { authenticateAdmin, createSession, getSessionUser } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
+// Auth Server Actions
+export async function loginAction(formData: FormData) {
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
+
+  if (!username || !password) {
+    return { error: "Please fill in all fields." };
+  }
+
+  const isValid = await authenticateAdmin(username, password);
+  if (!isValid) {
+    return { error: "Invalid username or password." };
+  }
+
+  const session = await createSession(username);
+  const cookieStore = await cookies();
+  cookieStore.set("admin_session", session, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60, // 24 hours
+    path: "/",
+  });
+
+  redirect("/admin");
+}
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("admin_session");
+  redirect("/admin/login");
+}
+
+// Protected Site Management Actions
 export async function createEvent(formData: FormData) {
+  const admin = await getSessionUser();
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const category = formData.get("category") as string;
@@ -19,7 +61,25 @@ export async function createEvent(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function deleteEvent(id: string) {
+  const admin = await getSessionUser();
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.event.delete({
+    where: { id },
+  });
+  revalidatePath("/admin/gallery");
+  revalidatePath("/");
+}
+
 export async function createService(formData: FormData) {
+  const admin = await getSessionUser();
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const imageUrl = formData.get("imageUrl") as string;
@@ -32,7 +92,25 @@ export async function createService(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function deleteService(id: string) {
+  const admin = await getSessionUser();
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.service.delete({
+    where: { id },
+  });
+  revalidatePath("/admin/services");
+  revalidatePath("/");
+}
+
 export async function createTeamMember(formData: FormData) {
+  const admin = await getSessionUser();
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+
   const name = formData.get("name") as string;
   const role = formData.get("role") as string;
   const imageUrl = formData.get("imageUrl") as string;
@@ -45,6 +123,20 @@ export async function createTeamMember(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function deleteTeamMember(id: string) {
+  const admin = await getSessionUser();
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.teamMember.delete({
+    where: { id },
+  });
+  revalidatePath("/admin/team");
+  revalidatePath("/");
+}
+
+// Public Form Submissions
 export async function createLead(formData: FormData) {
   const name = formData.get("name") as string;
   const phone = formData.get("phone") as string;

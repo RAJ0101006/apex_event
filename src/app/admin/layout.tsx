@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { LayoutDashboard, Image as ImageIcon, Briefcase, Users, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Image as ImageIcon, Briefcase, Users, MessageSquare, BarChart3, LogOut } from "lucide-react";
+import { logoutAction } from "./actions";
 
 export default function AdminLayout({
   children,
@@ -34,9 +35,26 @@ export default function AdminLayout({
             <MessageSquare size={20} />
             <span>Leads Desk</span>
           </Link>
+          <Link href="/admin/visitors" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-foreground/80 hover:text-primary">
+            <BarChart3 size={20} />
+            <span>Visitor Logs</span>
+          </Link>
         </nav>
-        <div className="p-4 border-t border-gray-200 text-sm text-center text-foreground/50">
-          Apex Event &copy; 2024
+        
+        {/* Logout Form in Sidebar Footer */}
+        <div className="p-4 border-t border-gray-200">
+          <form action={logoutAction}>
+            <button 
+              type="submit" 
+              className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors font-medium text-sm text-left"
+            >
+              <LogOut size={18} />
+              <span>Log Out</span>
+            </button>
+          </form>
+          <div className="mt-4 text-xs text-center text-foreground/50">
+            Apex Event &copy; 2026
+          </div>
         </div>
       </aside>
 
@@ -47,3 +65,4 @@ export default function AdminLayout({
     </div>
   );
 }
+

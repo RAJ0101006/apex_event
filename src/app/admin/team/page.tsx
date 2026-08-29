@@ -1,6 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
-import { createTeamMember } from "../actions";
-import { Plus } from "lucide-react";
+import { createTeamMember, deleteTeamMember } from "../actions";
+import { Plus, Trash2 } from "lucide-react";
 
 const prisma = new PrismaClient();
 
@@ -47,18 +49,34 @@ export default async function TeamPage() {
         {/* List */}
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {team.map((member) => (
-            <div key={member.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden text-center relative group shadow-sm">
-              {!member.visible && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
-                  <span className="bg-gray-200 text-foreground px-2 py-1 rounded text-xs font-bold shadow-sm">Hidden</span>
+            <div key={member.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden text-center relative group shadow-sm flex flex-col justify-between">
+              <div className="relative">
+                {!member.visible && (
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                    <span className="bg-gray-200 text-foreground px-2 py-1 rounded text-xs font-bold shadow-sm">Hidden</span>
+                  </div>
+                )}
+                
+                {/* Absolute Delete Button Overlay */}
+                <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <form action={deleteTeamMember.bind(null, member.id)}>
+                    <button 
+                      type="submit" 
+                      className="p-1.5 bg-white hover:bg-red-50 text-red-500 hover:text-red-700 rounded-lg transition-colors border border-gray-200 shadow-sm"
+                      title="Remove member"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </form>
                 </div>
-              )}
-              <div className="h-48 bg-gray-100 overflow-hidden border-b border-gray-200">
-                <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300" />
-              </div>
-              <div className="p-4">
-                <h3 className="font-heading font-bold text-lg text-foreground">{member.name}</h3>
-                <p className="text-xs text-primary mt-1 uppercase tracking-wider font-bold">{member.role}</p>
+
+                <div className="h-48 bg-gray-100 overflow-hidden border-b border-gray-200">
+                  <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-heading font-bold text-lg text-foreground">{member.name}</h3>
+                  <p className="text-xs text-primary mt-1 uppercase tracking-wider font-bold">{member.role}</p>
+                </div>
               </div>
             </div>
           ))}
@@ -67,3 +85,4 @@ export default async function TeamPage() {
     </div>
   );
 }
+

@@ -1,6 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
-import { createService } from "../actions";
-import { Plus } from "lucide-react";
+import { createService, deleteService } from "../actions";
+import { Plus, Trash2 } from "lucide-react";
 
 const prisma = new PrismaClient();
 
@@ -47,18 +49,31 @@ export default async function ServicesPage() {
         {/* List */}
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
           {services.map((service) => (
-            <div key={service.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden relative shadow-sm group">
-              {service.featured && (
-                <div className="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg z-10 shadow-sm">
-                  Exclusive Specialty
+            <div key={service.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden relative shadow-sm group flex flex-col justify-between">
+              <div>
+                {service.featured && (
+                  <div className="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg z-10 shadow-sm">
+                    Exclusive Specialty
+                  </div>
+                )}
+                <div className="h-40 bg-gray-100 overflow-hidden">
+                  <img src={service.imageUrl} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
-              )}
-              <div className="h-40 bg-gray-100 overflow-hidden">
-                <img src={service.imageUrl} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="p-4">
-                <h3 className="font-heading font-bold text-xl text-foreground">{service.title}</h3>
-                <p className="text-sm text-foreground/60 mt-2">{service.description}</p>
+                <div className="p-4">
+                  <div className="flex justify-between items-start gap-2">
+                    <h3 className="font-heading font-bold text-xl text-foreground">{service.title}</h3>
+                    <form action={deleteService.bind(null, service.id)}>
+                      <button 
+                        type="submit" 
+                        className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 shadow-xs flex-shrink-0"
+                        title="Remove service"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </form>
+                  </div>
+                  <p className="text-sm text-foreground/60 mt-2">{service.description}</p>
+                </div>
               </div>
             </div>
           ))}
@@ -67,3 +82,4 @@ export default async function ServicesPage() {
     </div>
   );
 }
+

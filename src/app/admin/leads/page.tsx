@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
 import { MessageCircle } from "lucide-react";
 
