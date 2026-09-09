@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { prisma } from "./db";
 import { verifyPassword, hashPassword, generateSalt } from "./crypto";
-export { createSession, verifySession } from "./session";
+import { createSession, verifySession } from "./session";
+export { createSession, verifySession };
 
 /**
  * Authenticates an admin user server-side without exposing credentials
